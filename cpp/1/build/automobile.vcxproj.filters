@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Song1\PycharmProjects\COVID\cpp\src\motorcycle.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\Song1\PycharmProjects\COVID\cpp\include\automobile_bits\motorcycle.hpp">
+      <Filter>include\automobile_bits</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Song1\PycharmProjects\COVID\cpp\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{3C761EF4-8E5F-3870-8673-B8AAA19C3126}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\automobile_bits">
+      <UniqueIdentifier>{37966E5F-8B02-3697-B812-522FDB64EA65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{82E34F48-BFFA-326E-87B3-B46D2959FFB4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

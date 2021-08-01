@@ -1,0 +1,5 @@
+C:/Users/Song1/PycharmProjects/COVID/cpp/build/CMakeFiles/INSTALL.dir
+C:/Users/Song1/PycharmProjects/COVID/cpp/build/CMakeFiles/automobile.dir
+C:/Users/Song1/PycharmProjects/COVID/cpp/build/CMakeFiles/PACKAGE.dir
+C:/Users/Song1/PycharmProjects/COVID/cpp/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/Song1/PycharmProjects/COVID/cpp/build/CMakeFiles/ZERO_CHECK.dir

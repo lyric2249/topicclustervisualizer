@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Song1\PycharmProjects\COVID\cpp\build\CMakeFiles\6d300516fa134772ccb1be25a08063f3\NightlyMemoryCheck.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\Song1\PycharmProjects\COVID\cpp\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\Song1\PycharmProjects\COVID\cpp\build\CMakeFiles\NightlyMemoryCheck" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{E15E7A20-4F74-3F08-AF8E-24502E634A7E}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
