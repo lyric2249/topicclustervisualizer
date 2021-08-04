@@ -1,5 +1,6 @@
 #include <iostream>
 #include <armadillo>
+#include <typeinfo>       // operator typeid
 
 using namespace std;
 using namespace arma;
@@ -156,10 +157,23 @@ main(int argc, char** argv)
   F(0, 1) = Ecd;
   F(1, 1) = Dcd;
 
-  F.print("F:");
+  F(0, 1).print("F:");
 
+  vec accept_z = q;
+
+  dcube accept_z_cube(accept_z.n_elem, 1, 1);
+  accept_z_cube.slice(0) = accept_z;
+  //output(0, 10) = accept_z_cube; //dvec
+  //accept_z_cube(0,0,0).print("accept_z_cube:");
+  accept_z_cube.slice(0)(0,)
+
+
+
+  
   F.save("mat_field");
 
+  std::cout << typeid(vectorise(accept_z_cube.slice(0))).name() << '/n';
+  //std::cout << typeid(q).name() << '/n';
 
   system("pause");
 

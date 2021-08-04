@@ -3,7 +3,9 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "C:/Users/Song1/anaconda3/envs/covid/Lib/site-packages/**",
+                "C:/Users/Song1/AppData/Local/Programs/Python/Python39/include/**"
             ],
             "defines": [
                 "_DEBUG",
