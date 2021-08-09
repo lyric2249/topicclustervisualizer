@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "C:/Users/Song1/anaconda3/envs/covid/Lib/site-packages/**",
-                "C:/Users/Song1/AppData/Local/Programs/Python/Python39/include/**"
+                "C:/Users/Song1/AppData/Local/Programs/Python/Python39/include/**",
+                "/mnt/c/Users/Song1/anaconda3/envs/covid/Lib/site-packages/**"
             ],
             "defines": [
                 "_DEBUG",
