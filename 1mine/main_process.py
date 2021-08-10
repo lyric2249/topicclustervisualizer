@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from function1.function1 import *
-import function1.lsrm1pl_normal_missing_mine
+#import function1.lsrm1pl_normal_missing_mine
 
 import scipy
 
@@ -95,7 +95,7 @@ output = onepl_lsrm_cont_missing(data,
     #output$accept_z
     ##Rcode procrustes matching
     """  
-) #TODO: View Output Table?
+) #TODO:: View Output Table?
 
 
 
@@ -123,14 +123,14 @@ def MCMC_process(data):
 
         if iter != max_address:
             z_proc[iter, :, :] = procrustes_mine(z_iter, z_star)
-            # z_proc[iter,:,:] = """procrustes(z_iter, z_star)$X.new""" #TODO ======= 210717 =======
+            # z_proc[iter,:,:] = """procrustes(z_iter, z_star)$X.new""" #TODO: ======= 210717 =======
         else:
             z_proc[iter, :, :] = z_iter
 
         w_iter = output['w'].iloc[iter, :, :]
 
         if iter != max_address:
-            w_proc[iter, :, :] = procrustes_mine(w_iter, w_star)  # TODO ======= 210717 =======
+            w_proc[iter, :, :] = procrustes_mine(w_iter, w_star)  # TODO: ======= 210717 =======
         else:
             w_proc[iter, :, :] = w_iter
 
@@ -223,7 +223,7 @@ pdf(paste0(dir, "/trace_w.pdf"))
 for (i in 1:ncol(output_new$beta)) ts.plot(output_new$w[, i, 1], main=paste("w_1", i))
 for (i in 1:ncol(output_new$beta)) ts.plot(output_new$w[, i, 2], main=paste("w_2", i))
 dev.off()
-"""  # TODO Multiple Write multiple Time Series Plot in pdf
+"""  # TODO: Multiple Write multiple Time Series Plot in pdf
 
 ## lsrm plot
 #### ggplot
@@ -243,7 +243,7 @@ M = pd.DataFrame([[cos(angle), sin(angle)], [-sin(angle), cos(angle)]], columns=
 # clockwise 회전용도. 따라서 일반적인 회전행렬의 inv. clockwise 기준 -6도씩 돌림.
 
 
-bnew = (-b[:, 1:2]).dot(M)  # TODO =========================================== #
+bnew = (-b[:, 1:2]).dot(M)  # TODO: =========================================== #
 # bnew = data.frame(as.matrix(-b[, 1:2]) % * % M)
 # bnew = data.frame(as.matrix(-b[,2:1]) %*% M) # for 75, 70 # 계수 컬럼1과 컬럼2가 교환됨. for what?
 
@@ -256,7 +256,7 @@ bnew.columns = b.columns
 # head(bnew)
 # head(a)
 
-anew = (-a[:, 1:2]).dot(M)  # TODO ===========================================
+anew = (-a[:, 1:2]).dot(M)  # TODO: ===========================================
 # anew = (-a[:, 2:1]).dot(M)
 
 anew.columns = ["coordinate_1", "coordinate_2"]
@@ -307,7 +307,7 @@ print(gg)
 dev.off()
 """
 
-################################################## TODO distance
+################################################## TODO: distance
 
 
 a["dist"] = (a["coordinate_1"] ** 2 + a["coordinate_2"] ** 2) ** 0.5
@@ -346,7 +346,7 @@ print(gg)
 dev.off()
 """
 
-####################### TODO: 3dplot
+####################### TODO:: 3dplot
 
 # par(mfrow=c(1, 1))
 # library(scatterplot3d)
@@ -368,7 +368,7 @@ colors = topic_cluster["cluster"]
 topic_plot = scatterplot3d(new[:, 1:3],
                            pch=16,
                            color=colors,
-                           angle=50)  # TODO =================================
+                           angle=50)  # TODO: =================================
 # word_plot$points3d(output_new$w_estimate,pch=8,color=color2)
 
 
@@ -411,10 +411,10 @@ for aa in range(3, (ncol(data_set2))):
             continue
 
 
-    # idist = as.matrix(dist(x= as.data.frame(b.iloc[:, 1:2]), method = "euclidean"))  # TODO ====================
+    # idist = as.matrix(dist(x= as.data.frame(b.iloc[:, 1:2]), method = "euclidean"))  # TODO: ====================
 
     
-    W = affinityMatrix(idist, K=aa)  # TODO =====================
+    W = affinityMatrix(idist, K=aa)  # TODO: =====================
     d = W.sum(axis=1)
 
     d[d == 0] = np.finfo("double").eps
@@ -452,25 +452,24 @@ for aa in range(3, (ncol(data_set2))):
     # wcss[aa] < - final$tot.withinss  # min #3:82%, 4: 61%, 5: 91%, 6:86%. 7:83%. 8: 85%, 9: 86%. 10: 87%
     # bet_tot[aa] < - final$betweenss / final$totss * 100  # max
     # bet[aa] < - final$betweenss
-}
 
 # which.max(bet_tot)
 
 
-# TODO =====================
-W = affinityMatrix(idist, K=which.max(bet_tot))  # TODO =====================
+# TODO: =====================
+W = affinityMatrix(idist, K=which.max(bet_tot))  # TODO: =====================
 
 ## cluster the topic using select number of cluster
-# ncluster <- min(k)  # TODO =====================
-ncluster = 3  # TODO =====================
+# ncluster <- min(k)  # TODO: =====================
+ncluster = 3  # TODO: =====================
 
 
-group_index = c()
+group_index = []
 
 for i in range(1, max(group) + 1):
     group_index[i] = min(np.where(group == i))
 
-# TODO =====================
+# TODO: =====================
 
 """
 ##plot of topic
@@ -530,7 +529,7 @@ print(ggg)
 dev.off()
 """
 
-quantile(word_position$dist, c(0.05, 0.2))
+#quantile(word_position$dist, c(0.05, 0.2))
 word_new = word_position[word_position["dist"] < 0.41,]
 
 # word_new
@@ -573,7 +572,7 @@ temp2.columns = ["x", "y"]
 
 # head(temp2)
 
-word_position = pd.concat([words, a[, 1:2]], axis=1)
+word_position = pd.concat([words, a[:, 1:2]], axis=1)
 close_word_index = []
 # head(word_position)
 
