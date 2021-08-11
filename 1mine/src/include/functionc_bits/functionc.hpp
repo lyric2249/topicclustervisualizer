@@ -28,7 +28,8 @@ class classfuncc
 
         arma::mat data;
 
-        int ndim, niter, nburn, nthin, nprint;
+        int ndim;
+        int niter, nburn, nthin, nprint;
 
         double jump_beta, jump_theta, jump_gamma, jump_z, jump_w;
         

@@ -3,7 +3,12 @@ from math import *
 import numpy as np
 import pandas as pd
 
-from function1.function1 import *
+#from pkgp.functionp import *
+from src.functionp import *
+
+#functionp.functionp
+
+#from ../functionp/functionp import *
 #import function1.lsrm1pl_normal_missing_mine
 
 import scipy
@@ -102,7 +107,7 @@ output = onepl_lsrm_cont_missing(data,
 
 
 
-
+################################################################################################
 
 def MCMC_process(data):
     nsample = data.shape[0]
@@ -174,7 +179,9 @@ def MCMC_process(data):
                 "accept_gamma": output["accept_gamma"]
                 }
 
-MCMC_process(data)
+################################################################################################
+
+output_new = MCMC_process(data)
 
 """
 #t(output_new$accept_beta)
@@ -357,6 +364,8 @@ new = pd.DataFrame({"x": b["coordinate_1"],
                     "topics": b["topic_name"]})  # word의 계수1, word의 계수2, beta의 측정치, word의 topic name,
 # output_new는 z_est, w_est, z.proc, w.proc으로 바꾼버전
 
+
+
 word_cluster = kmeans(output_new["z_estimate"], 4)
 # word_cluster["cluster"]
 
@@ -457,7 +466,11 @@ for aa in range(3, (ncol(data_set2))):
 
 
 # TODO: =====================
-W = affinityMatrix(idist, K=which.max(bet_tot))  # TODO: =====================
+
+
+W = affinityMatrix(idist, K = np.argmax(bet_tot)) # TODO: argmax 반환값이 어레이면 오류발생 가능성 # TODO: 
+
+#W = affinityMatrix(idist, K=which.max(bet_tot))  # TODO: =====================
 
 ## cluster the topic using select number of cluster
 # ncluster <- min(k)  # TODO: =====================
@@ -576,7 +589,7 @@ word_position = pd.concat([words, a[:, 1:2]], axis=1)
 close_word_index = []
 # head(word_position)
 
-library(ggrepel)
+#library(ggrepel)
 
 """
 pdf(paste0(dir, "/Plot3_topic_close_words.pdf"))
@@ -657,5 +670,5 @@ for (i in 1:nrow(temp2)){
 dev.off()
 """
 
-save.image("75_result.RData")
+#save.image("75_result.RData")
 
