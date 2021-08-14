@@ -43,3 +43,11 @@ def affinityMatrix(diff, K=20, sigma=0.5):
 
     W = (densities + densities.transpose) / 2
     return (W)
+
+
+
+
+
+
+
+

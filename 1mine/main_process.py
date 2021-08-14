@@ -3,7 +3,10 @@ from math import *
 import numpy as np
 import pandas as pd
 
-#from pkgp.functionp import *
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import scale
+from scipy.spatial.distance import euclidean
+
 from src.functionp import *
 
 #functionp.functionp
@@ -31,6 +34,7 @@ nburn = 5000
 nthin = 5
 nprint = 5000
 
+
 """
 모든 topic의 분포는 theta ~ 디리클레 알파를 따름
 
@@ -41,6 +45,7 @@ topic = z, word = w. z가 정해졌을 때 이로부터 각 단어가 가지는 
 
 골라진 topic에 대응하는 topic-word 분포로부터 단어 2개가 골라질 확률은 w_i, w_j ~ 다항(phi_z)를 따름
 """
+
 
 jump_beta = 0.3
 jump_theta = 1.0
@@ -87,31 +92,11 @@ output = onepl_lsrm_cont_missing(data,
 
                                  99)
 
-(
-    """
-    #output["accept_beta"].T
-    #output["accept_theta"]
-    ### View(t(output$accept_theta))
-
-    #output["accept_w"].T
-    #output["accept_gamma"].T
-    ### View(t(output$accept_z))
-
-    #output$accept_z
-    ##Rcode procrustes matching
-    """  
-) #TODO:: View Output Table?
-
-
-
-
-
 
 ################################################################################################
 
 def MCMC_process(data):
-    nsample = data.shape[0]
-    nitem = data.shape[1]
+    nsample, nitem = data.shape
 
     nmcmc = int((niter - nburn) / nthin)
 
@@ -183,55 +168,6 @@ def MCMC_process(data):
 
 output_new = MCMC_process(data)
 
-"""
-#t(output_new$accept_beta)
-#t(output_new$accept_theta)
-#t(output_new$accept_w)
-#t(output_new$accept_z)
-
-#output_new["accept_gamma"]
-
-# save.image("full_continuous_60.RData")
-# save.image("full_continuous_70.RData")
-# save.image("full_continuous_80.RData")
-# save.image("full_continuous_mean.RData")
-"""
-
-"""
-save.image("90_result.RData")
-
-dir
-pdf(paste0(dir, "/trace_beta.pdf"))
-for (i in 1:ncol(output_new$beta)) ts.plot(output_new$beta[1:nrow(output_new$beta), i], main = paste("beta", i))
-dev.off()
-
-pdf(paste0(dir, "/trace_theta.pdf"))
-for (i in 1:ncol(output_new$theta)) ts.plot(output_new$theta[, i], main=paste("theta", i))
-dev.off()
-
-pdf(paste0(dir, "/trace_sigma_theta.pdf"))
-ts.plot(output_new$theta_sd, main = "sigma_theta")
-dev.off()
-
-pdf(paste0(dir, "/trace_gamma.pdf"))
-ts.plot(output_new$gamma, main = "gamma")
-dev.off()
-"""
-# </editor-fold>
-
-
-"""
-pdf(paste0(dir, "/trace_z.pdf"))
-for (k in 1:ncol(output_new$theta)) ts.plot(output_new$z[, k, 1], main=paste("z_1", k))
-for (k in 1:ncol(output_new$theta)) ts.plot(output_new$z[, k, 2], main=paste("z_2", k))
-dev.off()
-
-pdf(paste0(dir, "/trace_w.pdf"))
-for (i in 1:ncol(output_new$beta)) ts.plot(output_new$w[, i, 1], main=paste("w_1", i))
-for (i in 1:ncol(output_new$beta)) ts.plot(output_new$w[, i, 2], main=paste("w_2", i))
-dev.off()
-"""  # TODO: Multiple Write multiple Time Series Plot in pdf
-
 ## lsrm plot
 #### ggplot
 
@@ -241,136 +177,41 @@ b = pd.DataFrame(output_new["w_estimate"], columns=["coordinate_1", "coordinate_
 b["topic_name"] = data_m.columns
 b["id"] = range(1, data_m.shape[1] + 1)
 
-############### Rotate
-
+#### Rotate
 
 angle = -pi / 30
 
 M = pd.DataFrame([[cos(angle), sin(angle)], [-sin(angle), cos(angle)]], columns=["coordinate_1", "coordinate_2"])
 # clockwise 회전용도. 따라서 일반적인 회전행렬의 inv. clockwise 기준 -6도씩 돌림.
 
-
-bnew = (-b[:, 1:2]).dot(M)  # TODO: =========================================== #
-# bnew = data.frame(as.matrix(-b[, 1:2]) % * % M)
-# bnew = data.frame(as.matrix(-b[,2:1]) %*% M) # for 75, 70 # 계수 컬럼1과 컬럼2가 교환됨. for what?
-
-
+bnew = (-b[:, 1:2]).dot(M)
+#for 75, 70 # 계수 컬럼1과 컬럼2가 교환된 식이 존재했음. for what?
 bnew["topic_name"] = b["topic_name"]
 bnew["id"] = b["id"]
-
 bnew.columns = b.columns
 
-# head(bnew)
-# head(a)
-
-anew = (-a[:, 1:2]).dot(M)  # TODO: ===========================================
-# anew = (-a[:, 2:1]).dot(M)
-
+anew = (-a[:, 1:2]).dot(M)
 anew.columns = ["coordinate_1", "coordinate_2"]
 
-"""
-
-gg = ggplot() +
-    geom_text(data=bnew, aes(x=coordinate_1, y=coordinate_2, label=id), col=2) +
-    # geom_text(data = b, aes(x=coordinate_1, y = coordinate_2, label = topic_name),col=2) +  #topic name
-    # geom_point(data = anew,aes(x=coordinate_1,y=coordinate_2),cex=1) +
-    xlim(min(bnew$coordinate_1, anew$coordinate_1)-0.2, max(bnew$coordinate_1, anew$coordinate_1)+0.2) +
-    ylim(min(bnew$coordinate_2, anew$coordinate_2)-0.2, max(bnew$coordinate_2, anew$coordinate_2)+0.2)
-    # xlim (-0.8,0.8) + ylim(-.8,.8)
-print(gg)
-
-b = bnew
-a = anew
-
-dir
-
-
-
-
-
-pdf(paste0(dir, "/plot_wz.pdf"))
-
-
-
-gg = ggplot() +
-    geom_text(data=b, aes(x=coordinate_1, y=coordinate_2, label=id), col=2) +
-    # geom_text(data = b, aes(x=coordinate_1, y = coordinate_2, label = topic_name),col=2) +  #topic name
-    geom_point(data=a, aes(x=coordinate_1, y=coordinate_2), cex=1) +
-    xlim(min(b$coordinate_1, a$coordinate_1)-0.2, max(b$coordinate_1, a$coordinate_1)+0.2) +
-    ylim(min(b$coordinate_2, a$coordinate_2)-0.2, max(b$coordinate_2, a$coordinate_2)+0.2)
-    # xlim (-0.8,0.8) + ylim(-.8,.8)
-print(gg)
-
-gg = ggplot() +
-    # geom_text(data = b, aes(x=coordinate_1, y = coordinate_2, label = id),col=2) +
-    geom_text(data=b, aes(x=coordinate_1, y=coordinate_2, label=topic_name), col=2) +  # topic name
-    geom_point(data=a, aes(x=coordinate_1, y=coordinate_2), cex=1) +
-    xlim(min(b$coordinate_1, a$coordinate_1)-0.2, max(b$coordinate_1, a$coordinate_1)+0.2) +
-    ylim(min(b$coordinate_2, a$coordinate_2)-0.2, max(b$coordinate_2, a$coordinate_2)+0.2)
-print(gg)
-
-
-
-dev.off()
-"""
-
-################################################## TODO: distance
-
+####################### TODO: distance
 
 a["dist"] = (a["coordinate_1"] ** 2 + a["coordinate_2"] ** 2) ** 0.5
-
-# head(a)
-# hist(a$dist)
-# summary(a$dist)
-# quantile(a$dist, c(0.8, 0.9))
-
 a_new = a[a["dist"] > 1.5, :]
 
-"""
-pdf(paste0(dir, "/plot_wz_new.pdf"))
-
-
-
-gg = ggplot() +
-    geom_text(data=b, aes(x=coordinate_1, y=coordinate_2, label=id), col=2) +
-    # geom_text(data = b, aes(x=coordinate_1, y = coordinate_2, label = topic_name),col=2) +  #topic name
-    geom_point(data=a_new, aes(x=coordinate_1, y=coordinate_2), cex=1) +
-    xlim(min(b$coordinate_1, a_new$coordinate_1)-0.2, max(b$coordinate_1, a_new$coordinate_1)+0.2) +
-    ylim(min(b$coordinate_2, a_new$coordinate_2)-0.2, max(b$coordinate_2, a_new$coordinate_2)+0.2)
-    # xlim (-0.8,0.8) + ylim(-.8,.8)
-print(gg)
-
-gg = ggplot() +
-    # geom_text(data = b, aes(x=coordinate_1, y = coordinate_2, label = id),col=2) +
-    geom_text(data=b, aes(x=coordinate_1, y=coordinate_2, label=topic_name), col=2) +  # topic name
-    geom_point(data=a_new, aes(x=coordinate_1, y=coordinate_2), cex=1) +
-    xlim(min(b$coordinate_1, a_new$coordinate_1)-0.2, max(b$coordinate_1, a_new$coordinate_1)+0.2) +
-    ylim(min(b$coordinate_2, a_new$coordinate_2)-0.2, max(b$coordinate_2, a_new$coordinate_2)+0.2)
-print(gg)
-
-
-
-dev.off()
-"""
 
 ####################### TODO:: 3dplot
-
-# par(mfrow=c(1, 1))
-# library(scatterplot3d)
 
 new = pd.DataFrame({"x": b["coordinate_1"],
                     "y": b["coordinate_2"],
                     "z": output_new["beta_estimate"],
-                    "topics": b["topic_name"]})  # word의 계수1, word의 계수2, beta의 측정치, word의 topic name,
+                    "topics": b["topic_name"]})  
+# word의 계수1, word의 계수2, beta의 측정치, word의 topic name,
 # output_new는 z_est, w_est, z.proc, w.proc으로 바꾼버전
 
 
 
-word_cluster = kmeans(output_new["z_estimate"], 4)
-# word_cluster["cluster"]
-
-topic_cluster = kmeans(b.iloc[:, 1:2], 4)
-# topic_cluster["cluster"]
+word_cluster = KMeans(n_clusters = 4).fit(output_new["z_estimate"]).labels_
+topic_cluster = KMeans(n_clusters = 4).fit(b.iloc[:, 1:2]).labels_
 
 colors = topic_cluster["cluster"]
 
@@ -380,22 +221,6 @@ topic_plot = scatterplot3d(new[:, 1:3],
                            angle=50)  # TODO: =================================
 # word_plot$points3d(output_new$w_estimate,pch=8,color=color2)
 
-
-"""
-pdf(paste0(dir, "/Plot5_3dplot_beta.pdf"))
-
-
-
-topic_plot = scatterplot3d(new[, -4], pch = 16, color = colors, angle = 50)
-text(topic_plot$xyz.convert(new[, -4]+0.3), labels = new$topics)
-
-topic_plot = scatterplot3d(new[, -4], pch = 16, color = colors, angle = 50)
-text(topic_plot$xyz.convert(new[, -4]+0.3), labels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
-                                                       19, 20))
-
-
-dev.off()
-"""
 ####################################
 
 wcss = bet_tot = bet = [1, 2]
@@ -403,11 +228,7 @@ ncluster = 5
 
 data_set2 = data_m
 
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import scale
-from scipy.spatial.distance import euclidean
-
-for aa in range(3, (ncol(data_set2))):
+for aa in range(3, data_set2.shape[1]):
     # aa=3
 
     X = b.iloc[:, 1:2]
@@ -484,31 +305,6 @@ for i in range(1, max(group) + 1):
 
 # TODO: =====================
 
-"""
-##plot of topic
-
-pdf(paste0(dir, "/Plot1_topic_cluter.pdf")) 
-
-
-
-ggg = ggplot() +
-    geom_point(data=b, aes(x=coordinate_1, y=coordinate_2), col=0.5) +
-    geom_text(data=b, aes(x=coordinate_1, y=coordinate_2, label=topic_name), col=as.factor(group), cex = 3) +
-    # geom_point(data = a, aes(x=coordinate_1,y= coordinate_2), cex=1) +
-    # geom_text(data = a[group_index,], aes(x=coordinate_1, y = coordinate_2+0.15, label = dbscan$cluster[group_index]),col=2) +
-    scale_color_manual(values=c("black", brewer.pal(n=9, name='Set1'))) +
-    # geom_point(data = a[!dbscan$isseed,],aes(coordinate_1, coordinate_2), shape=8, cex=1) +
-    xlim(min(b$coordinate_1, a$coordinate_1)-0.2, max(b$coordinate_1, a$coordinate_1)+0.2) +
-    ylim(min(b$coordinate_2, a$coordinate_2)-0.2, max(b$coordinate_2, a$coordinate_2)+0.2) +
-    # xlim (-0.8,1.2) + ylim(-.8,.1) +
-    theme_bw() + theme(legend.position = "None")
-
-print(ggg)
-
-
-
-dev.off()
-"""
 
 ###############################
 
@@ -517,55 +313,12 @@ word_position = pd.concat([data_word, a.iloc[:, 0:1]], axis=1)
 word_position["dist"] = (word_position["coordinate_1"] ** 2 + word_position["coordinate_2"] ** 2) ** 0.5
 word_new = word_position.loc[word_position["dist"] > 1.4, :]
 
-"""
-##plot of topic
-
-pdf(paste0(dir, "/topic_cluter_withwords.pdf"))
-
-
-ggg = ggplot() +
-    geom_point(data=b, aes(x=coordinate_1, y=coordinate_2), col=0.5) +
-    geom_text(data=b, aes(x=coordinate_1, y=coordinate_2, label=topic_name), col=as.factor(group), cex = 3) +
-    # geom_point(data = a, aes(x=coordinate_1,y= coordinate_2), cex=1) +
-    # geom_text(data = a[group_index,], aes(x=coordinate_1, y = coordinate_2+0.15, label = dbscan$cluster[group_index]),col=2)+
-    scale_color_manual(values=c("black", brewer.pal(n=9, name='Set1'))) +
-    # geom_point(data = a[!dbscan$isseed,],aes(coordinate_1, coordinate_2), shape=8, cex=1) +
-    geom_point(data=a_new, aes(x=coordinate_1, y=coordinate_2), cex=1) +
-    geom_label_repel(data=word_new, aes(x=coordinate_1, y=coordinate_2, label=data_word)) +
-    xlim(min(b$coordinate_1, a_new$coordinate_1)-0.2, max(b$coordinate_1, a_new$coordinate_1)+0.2) +
-    ylim(min(b$coordinate_2, a_new$coordinate_2)-0.2, max(b$coordinate_2, a_new$coordinate_2)+0.2) +
-    theme_bw() + theme(legend.position = "None")
-print(ggg)
-
-
-
-dev.off()
-"""
 
 #quantile(word_position$dist, c(0.05, 0.2))
 word_new = word_position[word_position["dist"] < 0.41,]
 
 # word_new
 
-"""
-pdf(paste0(dir,"/Plot4_topic_cluter_centerwords.pdf"))
-
-##plot of topic 
-ggg = ggplot() +
-  geom_point(data = b, aes(x=coordinate_1, y = coordinate_2),col=0.5) +
-  geom_text(data = b, aes(x=coordinate_1, y = coordinate_2, label = colnames(data_set2)),col=as.factor(group), cex=3) +
-  # geom_point(data = a, aes(x=coordinate_1,y= coordinate_2), cex=1) +
-  # geom_text(data = a[group_index,], aes(x=coordinate_1, y = coordinate_2+0.15, label = dbscan$cluster[group_index]),col=2)+
-  scale_color_manual(values = c("black", brewer.pal(n = 9, name = 'Set1'))) +
-  # geom_point(data = a[!dbscan$isseed,],aes(coordinate_1, coordinate_2), shape=8, cex=1) +
-  geom_point(data = a_new,aes(x=coordinate_1,y=coordinate_2),cex=1) + 
-  geom_label_repel(data = word_new, aes(x=coordinate_1,y=coordinate_2, label = data_word))+
-  xlim (min(b$coordinate_1,a_new$coordinate_1)-0.2,max(b$coordinate_1,a_new$coordinate_1)+0.2) + 
-  ylim(min(b$coordinate_2,a_new$coordinate_2)-0.2,max(b$coordinate_2,a_new$coordinate_2)+0.2) +
-  theme_bw() + theme(legend.position = "None") 
-print(ggg)
-dev.off()
-"""
 
 words = data_word
 close_word_index = []
@@ -591,36 +344,6 @@ close_word_index = []
 
 #library(ggrepel)
 
-"""
-pdf(paste0(dir, "/Plot3_topic_close_words.pdf"))
-
-for (i in 1:ncol(data_set2)){
-    ## here 10
-    # i = 1
-    close_word_index[[i]] = order(as.matrix(dist(rbind(b[i, 1:2], a[, 1:2])))[1, -1])[1: 25]
-    ggg = ggplot() +
-        geom_text(data=b, aes(x=coordinate_1, y=coordinate_2, label=seq(1: ncol(data_set2))), col =as.factor(group), cex = 3) +
-        geom_point(data=word_position[close_word_index[[i]],], aes(x=coordinate_1, y=coordinate_2), cex=1) +
-        geom_point(data=b[i,], aes(x=coordinate_1, y=coordinate_2), col='red', cex=7, shape=2, stroke=1) +
-        scale_color_manual(values=c("black", brewer.pal(n=9, name='Set1'))) +
-        xlim(min(b$coordinate_1, a$coordinate_1)-0.5, max(b$coordinate_1, a$coordinate_1)+0.5) +
-        ylim(min(b$coordinate_2, a$coordinate_2)-0.5, max(b$coordinate_2, a$coordinate_2)+0.5) +
-        labs(title=paste("Topic", i), x="", y="") +
-        theme_bw() + theme(legend.position = "None")
-
-    # ggg <- ggg+ geom_text_repel(data = word_position[close_word_index,], aes(x=X1, y = X2, label = covid_20_word), size=3)
-
-    ggg1 = ggg + 
-        geom_label_repel(data=word_position[close_word_index[[i]],],
-                         aes(x=coordinate_1, y=coordinate_2, label=words),
-                         # fontface = 'bold', color = 'white', box.padding = unit(0.5, "lines"),
-                         point.padding = unit(0.5, "lines"),
-                         segment.color = 'grey50'
-                        )
-    print(ggg1)
-}
-dev.off()
-"""
 
 ##### Cluster_Group near words
 
@@ -630,45 +353,6 @@ def euc_dist(x1, x2): sqrt(sum((x1 - x2) ** 2))
 
 # head(word_position)
 
-"""
-pdf(paste0(dir, "/Plot2_cluster_close_words.pdf"))
-
-
-
-for (i in 1:nrow(temp2)){
-    # i = 1
-    ## here 10
-    cluster_word_dist < -c()
-    close_word_index < -c()
-
-    for (k in c(1:nrow(output_new$z_estimate))){
-        cluster_word_dist[k]=euc.dist(temp2[i, -1], output_new$z_estimate[k, ])
-    }
-    close_word_index < -order(as.matrix(cluster_word_dist))[1: 25]
-    ggg = ggplot() +
-        geom_text(data=b, aes(x=coordinate_1, y=coordinate_2, label=seq(1: ncol(data_set2))), col =as.factor(group), cex = 3) +
-        geom_point(data=word_position[close_word_index,], aes(x=coordinate_1, y=coordinate_2), cex=1) +
-        geom_text(data=temp2[, -1], aes(x=x, y=y, label=paste("Group", seq(1, nrow(temp2)), sep="")), col = "red", cex = 3) +
-        # geom_point(data = b[i,], aes(x=coordinate_1,y= coordinate_2), col='red', cex=7, shape=2, stroke = 1) +
-        scale_color_manual(values=c("black", brewer.pal(n=9, name='Set1'))) +
-        labs(title=paste("Cluster", i), x="", y="") +
-        theme_bw() + theme(legend.position = "None")
-
-    print(ggg)
-    ggg1 = ggg + geom_label_repel(data=word_position[close_word_index,], 
-                                    aes(x=coordinate_1, y=coordinate_2, label=words),
-                                    # fontface = 'bold', color = 'white',
-                                    box.padding = unit(0.5, "lines"),
-                                    point.padding = unit(0.5, "lines"),
-                                    segment.color = 'grey50'
-                                )
-    print(ggg1)
-}
-
-
-
-dev.off()
-"""
 
 #save.image("75_result.RData")
 

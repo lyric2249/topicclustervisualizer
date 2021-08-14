@@ -3,9 +3,8 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/../include",
-                "~/../../usr/include/**",
+                "${workspaceFolder}/src/include/**",
+                "~/../../usr/include/eigen3/",
                 "~/anaconda3/include/**",
                 "~/anaconda3/lib/python3.8/site-packages/**"
             ],

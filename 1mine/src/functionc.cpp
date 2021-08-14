@@ -1,5 +1,6 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 
+#include <vector>
 #include <iostream>
 #include <armadillo>
 #include <pybind11/pybind11.h>
@@ -13,9 +14,9 @@ namespace py = pybind11;
 using namespace std;
 using namespace arma;
 
-field<cube> onepl_lsrm_cont_missing
+std::vector<py::array_t<double>> onepl_lsrm_cont_missing
 (
-    mat data,
+    py::array_t<double> & input,
 
     const int ndim,
     const int niter,
@@ -41,6 +42,8 @@ field<cube> onepl_lsrm_cont_missing
     const double missing
 )
 {
+    arma::Mat<double> data = carma::arr_to_mat<double>(input);
+    
     const int nsample = data.n_rows;
     const int nitem = data.n_cols;
 
@@ -105,12 +108,15 @@ field<cube> onepl_lsrm_cont_missing
         }
 
         // beta update
-        for (i = 0; i < nitem; i++) {
+        for (i = 0; i < nitem; i++) 
+        {
             newbeta(i) = oldbeta(i) + jump_beta * randn();
             // newbeta(i) = R::rnorm(oldbeta(i), jump_beta);
             old_like_beta = new_like_beta = 0.0;
-            for (k = 0; k < nsample; k++) {
-                if (data(k, i) != missing) {
+            for (k = 0; k < nsample; k++) 
+            {
+                if (data(k, i) != missing) 
+                {
                     new_like_beta += -pow((data(k, i) - newbeta(i) - oldtheta(k) + oldgamma * dist(k, i)), 2) / (2 * pow(pr_sd, 2));
                     old_like_beta += -pow((data(k, i) - oldbeta(i) - oldtheta(k) + oldgamma * dist(k, i)), 2) / (2 * pow(pr_sd, 2));
                 }
@@ -121,13 +127,15 @@ field<cube> onepl_lsrm_cont_missing
             ratio = num - den;
 
             if (ratio > 0.0) accept = 1;
-            else {
+            else 
+            {
                 un = randu();
                 if (log(un) < ratio) accept = 1;
                 else accept = 0;
             }
 
-            if (accept == 1) {
+            if (accept == 1) 
+            {
                 oldbeta(i) = newbeta(i);
                 accept_beta(i) += 1.0 / (niter * 1.0);
             }
@@ -136,12 +144,15 @@ field<cube> onepl_lsrm_cont_missing
         }
 
         // theta update
-        for (k = 0; k < nsample; k++) {
+        for (k = 0; k < nsample; k++) 
+        {
             newtheta(k) = oldtheta(k) + jump_theta * randn();
             old_like_theta = new_like_theta = 0.0;
 
-            for (i = 0; i < nitem; i++) {
-                if (data(k, i) != missing) {
+            for (i = 0; i < nitem; i++) 
+            {
+                if (data(k, i) != missing) 
+                {
                     new_like_theta += -pow((data(k, i) - oldbeta(i) - newtheta(k) + oldgamma * dist(k, i)), 2) / (2 * pow(pr_sd, 2));
                     old_like_theta += -pow((data(k, i) - oldbeta(i) - oldtheta(k) + oldgamma * dist(k, i)), 2) / (2 * pow(pr_sd, 2));
                 }
@@ -151,13 +162,15 @@ field<cube> onepl_lsrm_cont_missing
             ratio = num - den;
 
             if (ratio > 0.0) accept = 1;
-            else {
+            else 
+            {
                 un = randu();
                 if (log(un) < ratio) accept = 1;
                 else accept = 0;
             }
 
-            if (accept == 1) {
+            if (accept == 1) 
+            {
                 oldtheta(k) = newtheta(k);
                 accept_theta(k) += 1.0 / (niter * 1.0);
             }
@@ -169,9 +182,12 @@ field<cube> onepl_lsrm_cont_missing
         old_like_gamma = 0.0;
         new_like_gamma = 0.0;
 
-        for (k = 0; k < nsample; k++) {
-            for (i = 0; i < nitem; i++) {
-                if (data(k, i) != missing) {
+        for (k = 0; k < nsample; k++) 
+        {
+            for (i = 0; i < nitem; i++) 
+            {
+                if (data(k, i) != missing) 
+                {
                     new_like_gamma += -pow((data(k, i) - oldbeta(i) - newtheta(k) + newgamma * dist(k, i)), 2) / (2 * pow(pr_sd, 2));
                     old_like_gamma += -pow((data(k, i) - oldbeta(i) - newtheta(k) + oldgamma * dist(k, i)), 2) / (2 * pow(pr_sd, 2));
                 }
@@ -179,8 +195,8 @@ field<cube> onepl_lsrm_cont_missing
         }
 
 
-        num = new_like_gamma +
-            log_normpdf(log(oldgamma), log(newgamma), jump_gamma) +
+        num = new_like_gamma + 
+            log_normpdf(log(oldgamma), log(newgamma), jump_gamma) + 
             log_normpdf(log(newgamma), pr_mean_gamma, pr_sd_gamma);
         //R::dlnorm(oldgamma, std::log(newgamma), jump_gamma, 1) + 
         //R::dlnorm(newgamma, pr_mean_gamma, pr_sd_gamma, 1);
@@ -192,27 +208,32 @@ field<cube> onepl_lsrm_cont_missing
         ratio = num - den;
 
         if (ratio > 0.0) accept = 1;
-        else {
+        else 
+        {
             un = randu();
             if (log(un) < ratio) accept = 1;
             else accept = 0;
         }
 
-        if (accept == 1) {
+        if (accept == 1) 
+        {
             oldgamma = newgamma;
             accept_gamma += 1.0 / (niter * 1.0);
         }
         else newgamma = oldgamma;
 
         // zj update
-        for (k = 0; k < nsample; k++) {
+        for (k = 0; k < nsample; k++) 
+        {
             for (j = 0; j < ndim; j++) newz(k, j) = oldz(k, j) + jump_z * randn();
             old_like_z = new_like_z = 0.0;
 
             //calculate distance of oldw and newz
-            for (i = 0; i < nitem; i++) {
+            for (i = 0; i < nitem; i++) 
+            {
                 dist_old_temp = dist_new_temp = 0.0;
-                for (j = 0; j < ndim; j++) {
+                for (j = 0; j < ndim; j++) 
+                {
                     dist_new_temp += pow((newz(k, j) - oldw(i, j)), 2.0);
                     dist_old_temp += pow((oldz(k, j) - oldw(i, j)), 2.0);
                 }
@@ -221,15 +242,18 @@ field<cube> onepl_lsrm_cont_missing
             }
 
             //calculate likelihood
-            for (i = 0; i < nitem; i++) {
-                if (data(k, i) != missing) {
+            for (i = 0; i < nitem; i++) 
+            {
+                if (data(k, i) != missing) 
+                {
                     new_like_z += -pow((data(k, i) - oldbeta(i) - oldtheta(k) + oldgamma * new_dist_k(i)), 2) / (2 * pow(pr_sd, 2));
                     old_like_z += -pow((data(k, i) - oldbeta(i) - oldtheta(k) + oldgamma * old_dist_k(i)), 2) / (2 * pow(pr_sd, 2));
                 }
             }
 
             num = den = 0.0;
-            for (j = 0; j < ndim; j++) {
+            for (j = 0; j < ndim; j++) 
+            {
                 num += log_normpdf(newz(k, j), pr_mean_z, pr_sd_z);
                 //#num += scipy.stats.norm.logpdf(newz[k, j], pr_mean_z, pr_sd_z)
                 den += log_normpdf(oldz(k, j), pr_mean_z, pr_sd_z);
@@ -243,17 +267,20 @@ field<cube> onepl_lsrm_cont_missing
             ratio = num - den;
 
             if (ratio > 0.0) accept = 1;
-            else {
+            else 
+            {
                 un = randu();
                 if (log(un) < ratio) accept = 1;
                 else accept = 0;
             }
 
-            if (accept == 1) {
+            if (accept == 1) 
+            {
                 for (j = 0; j < ndim; j++) oldz(k, j) = newz(k, j);
                 accept_z(k) += 1.0 / (niter * 1.0);
             }
-            else {
+            else 
+            {
                 for (j = 0; j < ndim; j++) newz(k, j) = oldz(k, j);
             }
         }
@@ -386,58 +413,33 @@ field<cube> onepl_lsrm_cont_missing
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    field<cube> output(1, 13); 
-    dcube samp_beta_cube(samp_beta.n_rows, samp_beta.n_cols, 1);
-    samp_beta_cube.slice(0) = samp_beta;
-    output(0, 0) = samp_beta_cube; //dmat
+    std::vector<py::array_t<double>> matrices;
 
-    dcube samp_theta_cube(samp_theta.n_rows, samp_theta.n_cols, 1);
-    samp_theta_cube.slice(0) = samp_theta;
-    output(0, 1) = samp_theta_cube; //dmat
+    //엘레멘트들이 cube인 벡터
 
-    output(0, 2) = samp_z; //dcube
-    output(0, 3) = samp_w; //dcube
+    auto accept_gamma_arr = py::array_t<double>({1}); 
+    accept_gamma_arr.mutable_at(0) = accept_gamma;
 
+    matrices.push_back(carma::mat_to_arr(samp_beta, false));
+    matrices.push_back(carma::mat_to_arr(samp_theta, false));
+    matrices.push_back(carma::cube_to_arr(samp_z, false));
+    matrices.push_back(carma::cube_to_arr(samp_w, false));
+    matrices.push_back(carma::col_to_arr(samp_gamma, false)); TODO:
+    matrices.push_back(carma::col_to_arr(samp_sd_theta, false));
+    matrices.push_back(carma::col_to_arr(samp_sd, false));
+    matrices.push_back(carma::col_to_arr(samp_mle, false));
+    matrices.push_back(carma::col_to_arr(accept_beta, false));
+    matrices.push_back(carma::col_to_arr(accept_theta, false));
+    matrices.push_back(carma::col_to_arr(accept_z, false));
+    matrices.push_back(carma::col_to_arr(accept_w, false));
+    matrices.push_back(accept_gamma_arr);
 
-    dcube samp_gamma_cube(samp_gamma.n_elem, 1, 1);
-    samp_gamma_cube.slice(0) = samp_gamma;
-    output(0, 4) = samp_gamma_cube; //dvec
-
-    dcube samp_sd_theta_cube(samp_sd_theta.n_elem, 1, 1);
-    samp_sd_theta_cube.slice(0) = samp_sd_theta;
-    output(0, 5) = samp_sd_theta_cube; //dvec
-    
-    dcube samp_sd_cube(samp_sd.n_elem, 1, 1);
-    samp_sd_cube.slice(0) = samp_sd;
-    output(0, 6) = samp_sd_cube; //dvec
-    
-    dcube samp_mle_cube(samp_mle.n_elem, 1, 1);
-    samp_mle_cube.slice(0) = samp_mle;
-    output(0, 7) = samp_mle_cube; //dvec
-    
-    dcube accept_beta_cube(accept_beta.n_elem, 1, 1);
-    accept_beta_cube.slice(0) = accept_beta;
-    output(0, 8) = accept_beta_cube; //dvec
-    
-    dcube accept_theta_cube(accept_theta.n_elem, 1, 1);
-    accept_theta_cube.slice(0) = accept_theta;
-    output(0, 9) = accept_theta_cube; //dvec
-    
-    dcube accept_z_cube(accept_z.n_elem, 1, 1);
-    accept_z_cube.slice(0) = accept_z;
-    output(0, 10) = accept_z_cube; //dvec
-    
-    dcube accept_w_cube(accept_w.n_elem, 1, 1);
-    accept_w_cube.slice(0) = accept_w;
-    output(0, 11) = accept_w_cube; //dvec
-    
-    output(0, 12) = accept_gamma; //double
-
-    return(output);
-
+    return matrices;
 } // function end
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/* 
 
 py::array_t<double> return_results(arma::field<cube> input, int col)
 {
@@ -451,11 +453,17 @@ py::array_t<double> return_results(arma::field<cube> input, int col)
 
     return value;
 
-};
+}; 
+
+*/
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+PYBIND11_MODULE(functionc, m)
+{
+    m.doc() = "minimal working example";
+    m.def("onepl_lsrm_cont_missing", &onepl_lsrm_cont_missing);
+}
 
 
 

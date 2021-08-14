@@ -8,12 +8,8 @@
 // #include <pybind11/stl.h>
 // #include <carma>
 
-
 // #include <pybind11/numpy.h>
-
 // namespace py = pybind11;
-
-
 
 //using namespace std;
 //using namespace arma;
