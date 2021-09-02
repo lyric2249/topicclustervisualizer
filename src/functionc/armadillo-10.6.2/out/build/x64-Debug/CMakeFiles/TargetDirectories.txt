@@ -1,0 +1,6 @@
+C:/Users/Song1/source/repos/functioncc/functioncc/armadillo-10.6.2/out/build/x64-Debug/CMakeFiles/armadillo.dir
+C:/Users/Song1/source/repos/functioncc/functioncc/armadillo-10.6.2/out/build/x64-Debug/CMakeFiles/install/local.dir
+C:/Users/Song1/source/repos/functioncc/functioncc/armadillo-10.6.2/out/build/x64-Debug/CMakeFiles/install.dir
+C:/Users/Song1/source/repos/functioncc/functioncc/armadillo-10.6.2/out/build/x64-Debug/CMakeFiles/edit_cache.dir
+C:/Users/Song1/source/repos/functioncc/functioncc/armadillo-10.6.2/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
+C:/Users/Song1/source/repos/functioncc/functioncc/armadillo-10.6.2/out/build/x64-Debug/CMakeFiles/list_install_components.dir

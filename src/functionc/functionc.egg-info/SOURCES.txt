@@ -1,0 +1,7 @@
+functionc.cpp
+pyproject.toml
+setup.py
+functionc.egg-info/PKG-INFO
+functionc.egg-info/SOURCES.txt
+functionc.egg-info/dependency_links.txt
+functionc.egg-info/top_level.txt

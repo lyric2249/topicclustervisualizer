@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "iostream": "cpp",
-        "chrono": "cpp",
-        "xlocale": "cpp"
-    },
-    "jupyter.jupyterServerType": "local"
-}

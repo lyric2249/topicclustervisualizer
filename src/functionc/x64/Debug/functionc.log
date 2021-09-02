@@ -1,0 +1,5 @@
+﻿  functionc.cpp
+C:\Users\Song1\anaconda3\Library\include\pybind11\detail\common.h(112,1): warning C4005: 'HAVE_SNPRINTF': 매크로 재정의
+C:\Users\Song1\anaconda3\include\pyerrors.h(315): message : 'HAVE_SNPRINTF'의 이전 정의를 참조하십시오.
+     C:\Users\Song1\source\repos\Project3\x64\Debug\functionc.lib 라이브러리 및 C:\Users\Song1\source\repos\Project3\x64\Debug\functionc.exp 개체를 생성하고 있습니다.
+  functionc.vcxproj -> C:\Users\Song1\source\repos\Project3\x64\Debug\functionc.pyd
