@@ -1,3 +1,0 @@
-C:/Users/Song1/PycharmProjects/COVID/cpp/tests/build/CMakeFiles/test.dir
-C:/Users/Song1/PycharmProjects/COVID/cpp/tests/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/Song1/PycharmProjects/COVID/cpp/tests/build/CMakeFiles/ZERO_CHECK.dir

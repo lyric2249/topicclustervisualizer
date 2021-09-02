@@ -1,6 +1,0 @@
-#ifndef FUNCTIONC_H
-#define FUNCTIONC_H
-
-#include "functionc_bits/functionc.hpp"
-
-#endif

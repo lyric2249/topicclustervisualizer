@@ -1,7 +1,0 @@
-/mnt/c/Users/Song1/PycharmProjects/COVID/armadillo-10.6.1/CMakeFiles/install/strip.dir
-/mnt/c/Users/Song1/PycharmProjects/COVID/armadillo-10.6.1/CMakeFiles/install/local.dir
-/mnt/c/Users/Song1/PycharmProjects/COVID/armadillo-10.6.1/CMakeFiles/install.dir
-/mnt/c/Users/Song1/PycharmProjects/COVID/armadillo-10.6.1/CMakeFiles/list_install_components.dir
-/mnt/c/Users/Song1/PycharmProjects/COVID/armadillo-10.6.1/CMakeFiles/rebuild_cache.dir
-/mnt/c/Users/Song1/PycharmProjects/COVID/armadillo-10.6.1/CMakeFiles/edit_cache.dir
-/mnt/c/Users/Song1/PycharmProjects/COVID/armadillo-10.6.1/CMakeFiles/armadillo.dir
