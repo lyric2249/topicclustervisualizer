@@ -48,9 +48,9 @@ def affinityMatrix(diff, K=20, sigma=0.5):
     W = (densities + densities.transpose()) / 2
     return (W)
 
+0
 
-
-
+0
 
 
 def MCMC_process(data, niter, nburn, nthin, ndim, output):
