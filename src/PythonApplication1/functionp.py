@@ -53,7 +53,7 @@ def affinityMatrix(diff, K=20, sigma=0.5):
 
 
 
-def MCMC_process(data):
+def MCMC_process(data, niter, nburn, nthin, ndim, output):
 
     import time
 
