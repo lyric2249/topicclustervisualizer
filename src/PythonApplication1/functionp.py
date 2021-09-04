@@ -52,5 +52,3 @@ def affinityMatrix(diff, K=20, sigma=0.5):
 
 
 
-
-
