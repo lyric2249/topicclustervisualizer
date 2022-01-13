@@ -1,9 +1,0 @@
-libdir=C:/Users/Song1/source/repos/functioncc/functioncc/armadillo-10.6.2/out/install/x64-Debug/lib
-includedir=C:/Users/Song1/source/repos/functioncc/functioncc/armadillo-10.6.2/out/install/x64-Debug/include
-
-Name: armadillo
-Description: Fast C++ matrix library with syntax similar to MATLAB and Octave
-URL: http://arma.sourceforge.net
-Version: 10.6.2
-Cflags: -I${includedir}
-Libs: -L${libdir} -larmadillo
