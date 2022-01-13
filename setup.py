@@ -21,6 +21,7 @@ setup(
     name='topic_cluster_visualizer',
     version='0.2',
     description='',
+    url = 'https://github.com/lyric2249/topicclustervisualizer',
     packages=find_packages(exclude=['tests']),
     install_requires = ['plotly >= 4.14.3', 'factor-analyzer >= 0.4.0'],
     ext_modules=[fcc_module],
