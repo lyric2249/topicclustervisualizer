@@ -4,16 +4,19 @@
 
 from math import *
 
+import re
+import time
+import itertools
+
 import numpy as np
 import pandas as pd
 
-#from plotly.offline import iplot, init_notebook_mode
-#init_notebook_mode()
+import nltk
+from nltk.stem import PorterStemmer
+#from nltk.corpus import stopwords
 
-from .utils import clean, word_tokenize, pos_tagging, stemming, filtering
-#from c2preprocess import Preprocess
-#from c3word_model import WordModel
-#from c4make_corpus import MakeCorpus
+from gensim.models import Word2Vec, KeyedVectors
+from collections import Counter
 
 from tqdm.auto import tqdm, trange
 
@@ -21,36 +24,139 @@ from factor_analyzer import Rotator
 
 from functionc import onepl_lsrm_cont_missing
 
-import itertools
-
-import time
-
-#filtered = filtering(filter_terms)
 
 
 class TopicClusterVisualizer:
-    def __init__(self):
+    def __init__(self, target_data):
         self.filter_terms = {'p.001', 'find', 'z9.738', 'n102', 'p0.0001', 'p.05', 'p0.03', 'n1427', 'sd', 'coronaviru', 'case',
                              'number', 'studi', 'date', 'result', 'hope', 'refer', 'major', 'b', 'n', 'besid', 'ie', 'l.', 'fact',
                              'e.g.', 'h', 'p', 'half', 'virus', 'viru', 'disease', 'coronavirus', 'data', 'rate', 'factor',
                              'method', 'test', 'model', 'analysis', 'health', 'death', 'measure'}
         
+        self.corpus = None
+        
+        self.target_data = target_data
+        
+        self.vector_size = 256
+        self.window = 3
+        self.min_count = 1
+        self.worker = 4
+        self.sg = 1
+        self.negative = 20
+
+        self.epochs = 1
+
+        self.near_term_topn_val = 10
+        
     ##### 1.
 
-    def _make_tokens(self, documents):
-        data_word2vec = []
+    def _get_terms(self, text):
+        
+        ps = PorterStemmer()
+        #stopwords = set(stopwords.words('english'))
         
         filter_terms = self.filter_terms
-
-        for document in documents:
-            text = clean(document)
-            tokens = word_tokenize(text)
-            nouns = pos_tagging(tokens)
-            stemmed = stemming(nouns)
-            filtered = filtering(stemmed, self.filter_terms)
-            data_word2vec.append(filtered)
         
-        return data_word2vec
+        def clean(text): 
+            return re.sub(r'[^a-zA-Z0-9\-]', ' ', text).lower()
+
+        def word_tokenize(text): 
+            return nltk.word_tokenize(text)
+
+        def pos_tagging(tokens, pos_filter={"NN", "JJ"}):
+            tagged = nltk.pos_tag(tokens)
+            nouns = [w for (w, pos) in tagged if pos[:2] in pos_filter]
+            meaningful = [w for (w, pos) in tagged if pos[:2] in "JJ" and "-" in w]
+            return nouns + meaningful
+
+        def stemming(tokens): 
+            return [ps.stem(t) for t in tokens]
+
+        def filtering(tokens): 
+            return [t for t in tokens if t not in filter_terms]
+        
+        text = clean(text)
+        tokens = word_tokenize(text)
+        nouns = pos_tagging(tokens)
+        stemmed = stemming(nouns)
+        filtered = filtering(stemmed)
+
+        return ",".join(filtered) if filtered else None
+
+    def _train_corpus(self, corpus, train_data, keywords):
+        
+        near_term_topn_val = self.near_term_topn_val
+
+        corpus_4_train = [lst.split(",") for lst in train_data if lst]
+
+        model = Word2Vec(sentences=corpus_4_train, 
+                        
+                        size=self.vector_size, 
+                        window=self.window,
+                        min_count=self.min_count, 
+                        workers=self.worker, 
+                        sg=self.sg, 
+                        negative=self.negative,
+                        
+                        iter=self.epochs)
+
+        def nearest_terms_func(term, near_term_topn):
+            if term in model.wv.vocab: 
+                return [x[0] for x in model.wv.most_similar(term, topn=near_term_topn)]
+            return []
+
+        min_freq = 3
+
+        total_abs_terms = [word for words in corpus if words for word in words]
+        abs_terms = [term for term, freq in Counter(total_abs_terms).items() if freq >= min_freq]
+
+        total_kwd_terms = [word for words in keywords.values if words for word in words.split(",")]
+        kwd_terms = [term for term, freq in Counter(total_kwd_terms).items() if freq >= min_freq]
+
+        print("# total terms: abstract - {:,}, keywords - {:,}".format(len(total_abs_terms), len(total_kwd_terms)))
+        print("# used terms for corpus: abstract - {:,}, keywords - {:,}".format(len(abs_terms), len(kwd_terms)))
+
+        nearest_terms = set()
+        for term in kwd_terms:
+            terms = nearest_terms_func(term, near_term_topn_val)
+            if terms:
+                nearest_terms.update(terms)
+
+        # 키워드 기반으로, word2vec 에서 단어로 선정된 애들 중에서 각 키워드들이랑 가까운 단어만 엄선해서 얘들로 새로운 앱스트랙 재료 (vocab3) 
+        # 만들고 각 앱스트랙의 tokened 단어들 중 이 vocab3에 들어있을 경우에만 생존시킨다
+
+        terms = set(abs_terms) & set(nearest_terms)
+        vocab_set = set(terms)
+
+        trained_corpus = corpus.map(lambda x: set(x) & vocab_set).map(lambda x: list(x))
+        
+        return trained_corpus
+    
+    
+    def preprocess(self, train_data = None, keywords = None, train = False):
+        
+        target_data=self.target_data
+        
+        train_data = train_data.dropna().map(lambda x: self._get_terms(x))
+        keywords = keywords.dropna().map(lambda x: self._get_terms(x))
+
+        print("# raw data: {:,}".format(target_data.shape[0]))
+        
+        corpus = target_data.dropna().map(lambda x: self._get_terms(x)).dropna().map(lambda x: x.split(","))
+        
+        if train:
+            if (not train_data.empty) + (not keywords.empty) == 1:
+                print("No train data or keywords. Return non-trained corpus. Saved in .corpus attribute.")
+                self.corpus = corpus
+            print("Return trained corpus. Saved in .corpus attribute.")
+            self.corpus = self._train_corpus(corpus, train_data, keywords)
+        
+        else:
+            print("Return non-trained corpus. Saved in .corpus attribute.")
+            self.corpus = corpus
+        
+        
+
         
     ##### 2.
             
@@ -90,7 +196,7 @@ class TopicClusterVisualizer:
                 Z[ibi] = np.random.choice(num_topics, 1, p=pz)
                 Nwz[bi[0], Z[ibi]] += 1
                 Nwz[bi[1], Z[ibi]] += 1
-                Nz[Z[ibi]] += 1
+                Nz[Z[ibi]] += 1      
             print ("Variation between iterations:  " + str(np.sqrt(np.sum((Nz-Nzold)**2))))
 
         return Nz, Nwz, Z
@@ -395,9 +501,9 @@ class TopicClusterVisualizer:
 
     def fit(self, 
             
-            docs, 
-            
             niter1 = 20,
+            #nburn1 = 0,
+            #nthin1 = 1
             num_topics1 = 20,
             alpha1 = 1.0,
             beta1 = 0.1,
@@ -425,7 +531,7 @@ class TopicClusterVisualizer:
         
         start = time.time()
         
-        tokenized_docs = self._make_tokens(docs)
+        tokenized_docs = self.corpus
         
         btm = self._BTM(tokenized_docs, 
                         niter = niter1, 
