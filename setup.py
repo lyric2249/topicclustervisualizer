@@ -12,11 +12,7 @@ fcc_module = Extension(
     sources=['functionc.cpp'],
     include_dirs=[pybind11.get_include(), 
     
-                  dir_path + "\\carma-0.5.2\\include\\**",
-                  
-                  dir_path + "__file__\\numpy\\core\\include\\**",
-                  
-                  dir_path + "__file__\\armadillo-10.6.2\\include\\**"],
+                  "include"],
     language='c++',
     #extra_compile_args=cpp_args,
     extra_compile_args=['-std=c++11', '-stdlib=libc++', '-mmacosx-version-min=10.7'],
