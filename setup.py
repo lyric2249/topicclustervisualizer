@@ -15,7 +15,7 @@ fcc_module = Extension(
                   "include"],
     language='c++',
     #extra_compile_args=cpp_args,
-    extra_compile_args=['-std=c++11', '-stdlib=libc++', '-mmacosx-version-min=10.7'],
+    extra_compile_args=['-std=c++14', '-stdlib=libc++', '-mmacosx-version-min=10.7'],
     )
 
 setup(
