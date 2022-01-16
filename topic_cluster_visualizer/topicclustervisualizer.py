@@ -81,7 +81,7 @@ class TopicClusterVisualizer:
         stemmed = stemming(nouns)
         filtered = filtering(stemmed)
 
-        return ",".join(filtered) if filtered else None
+        return ",".join(filtered) if filtered else return stemmed
 
     def _train_corpus(self, corpus, train_data, keywords):
         
@@ -113,8 +113,8 @@ class TopicClusterVisualizer:
         total_kwd_terms = [word for words in keywords.values if words for word in words.split(",")]
         kwd_terms = [term for term, freq in Counter(total_kwd_terms).items() if freq >= min_freq]
 
-        print("# total terms: abstract - {:,}, keywords - {:,}".format(len(total_abs_terms), len(total_kwd_terms)))
-        print("# used terms for corpus: abstract - {:,}, keywords - {:,}".format(len(abs_terms), len(kwd_terms)))
+        print("# total terms: before train corpus - {:,}, keywords - {:,}".format(len(total_abs_terms), len(total_kwd_terms)))
+        print("# used terms for corpus: before train corpus - {:,}, keywords - {:,}".format(len(abs_terms), len(kwd_terms)))
 
         nearest_terms = set()
         for term in kwd_terms:
