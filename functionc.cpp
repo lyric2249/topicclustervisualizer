@@ -491,12 +491,12 @@ onepl_lsrm_cont_missing
 
     //������Ʈ���� cube�� ����
 
-    matrices.push_back(carma::mat_to_arr(samp_beta, false));
-    matrices.push_back(carma::mat_to_arr(samp_theta, false));
-    matrices.push_back(carma::cube_to_arr(samp_z, false));
-    matrices.push_back(carma::cube_to_arr(samp_w, false));
-    matrices.push_back(carma::col_to_arr(samp_gamma, false));
-    matrices.push_back(carma::col_to_arr(samp_sd_theta, false));
+    matrices.push_back(carma::mat_to_arr(samp_beta, false));//FIXME:
+    matrices.push_back(carma::mat_to_arr(samp_theta, false));//FIXME:
+    matrices.push_back(carma::cube_to_arr(samp_z, false)); //FIXME:
+    matrices.push_back(carma::cube_to_arr(samp_w, false)); //FIXME:
+    matrices.push_back(carma::col_to_arr(samp_gamma, false));//FIXME:
+    matrices.push_back(carma::col_to_arr(samp_sd_theta, false));//FIXME:
     matrices.push_back(carma::col_to_arr(samp_sd, false));
     matrices.push_back(carma::col_to_arr(samp_mle, false));
     matrices.push_back(carma::col_to_arr(accept_beta, false));
